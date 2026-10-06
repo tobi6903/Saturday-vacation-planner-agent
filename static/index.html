@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfect Saturday Planner ✨</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fdf4ff', 100:'#fae8ff', 500:'#a855f7', 600:'#9333ea', 700:'#7e22ce' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .trace-item { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { opacity:0; transform:translateX(-10px); } to { opacity:1; transform:translateX(0); } }
+    .plan-card { animation: fadeUp 0.4s ease-out; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .pulse-dot { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .slot-line::before { content:''; position:absolute; left:19px; top:40px; bottom:-8px; width:2px; background: linear-gradient(#a855f7, #e9d5ff); }
+    .slot-line:last-child::before { display:none; }
+    input[type=range] { accent-color: #9333ea; }
+    .tag-btn { transition: all 0.15s; }
+    .tag-btn.active { background: #9333ea; color: white; border-color: #9333ea; }
+    .progress-step { transition: all 0.3s; }
+    .progress-step.done { background:#a855f7; color:white; }
+    .progress-step.active { background:#f3e8ff; border:2px solid #a855f7; color:#7e22ce; }
+    .cost-bar { transition: width 0.8s ease; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="gradient-bg text-white py-8 px-4 text-center">
+    <h1 class="text-3xl font-bold tracking-tight">✨ Perfect Saturday Planner</h1>
+    <p class="mt-2 text-purple-200 text-sm">Tell us about yourself — we'll craft your ideal day</p>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- LEFT: Form -->
+    <section class="bg-white rounded-2xl card-shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-800 mb-5">Plan My Saturday</h2>
+      <form id="plannerForm" class="space-y-5">
+
+        <!-- City -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <input id="city" type="text" value="Bangalore" placeholder="e.g. Bangalore, Mumbai, Delhi"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400" required />
+        </div>
+
+        <!-- Budget -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Budget: <span id="budgetLabel" class="text-purple-600 font-semibold">₹2,000</span>
+            <span id="budgetTag" class="ml-2 text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Medium</span>
+          </label>
+          <input id="budget" type="range" min="200" max="10000" step="100" value="2000"
+            class="w-full" oninput="updateBudget(this.value)" />
+          <div class="flex justify-between text-xs text-gray-400 mt-1">
+            <span>₹200 (Low)</span><span>₹5,000 (High)</span><span>₹10,000 (Premium)</span>
+          </div>
+        </div>
+
+        <!-- Available Time -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Available Time</label>
+          <select id="available_time"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400">
+            <option value="2 hours">2 hours</option>
+            <option value="3 hours">3 hours</option>
+            <option value="4 hours" selected>4 hours</option>
+            <option value="5 hours">5 hours</option>
+            <option value="6 hours">6 hours</option>
+            <option value="full day (8 hours)">Full Day (8 hours)</option>
+          </select>
+        </div>
+
+        <!-- Mood -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mood</label>
+          <div class="grid grid-cols-2 gap-2" id="moodGrid">
+            <button type="button" data-mood="Tired but wants something fun" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">😴 Tired but fun</button>
+            <button type="button" data-mood="Energetic and ready for adventure" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">⚡ Energetic</button>
+            <button type="button" data-mood="Relaxed and want to unwind" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">🌿 Relaxed</button>
+            <button type="button" data-mood="Socialising and want to meet people" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">🤝 Social</button>
+            <button type="button" data-mood="Creative and want to explore culture and art" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">🎨 Creative</button>
+            <button type="button" data-mood="Romantic getaway for two" onclick="selectMood(this)"
+              class="mood-btn tag-btn text-xs border border-gray-300 rounded-lg px-3 py-2 text-left hover:border-purple-400">💕 Romantic</button>
+          </div>
+          <input id="mood" type="hidden" value="Tired but wants something fun" />
+          <input id="moodCustom" type="text" placeholder="Or type your own mood..."
+            class="w-full mt-2 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+            oninput="document.getElementById('mood').value=this.value" />
+        </div>
+
+        <!-- Interests -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Interests <span class="text-gray-400 text-xs">(select all that apply)</span></label>
+          <div class="flex flex-wrap gap-2" id="interestGrid">
+            <button type="button" data-interest="food" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🍽️ Food</button>
+            <button type="button" data-interest="music" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🎵 Music</button>
+            <button type="button" data-interest="walks" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400 active">🚶 Walks</button>
+            <button type="button" data-interest="culture" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🏛️ Culture</button>
+            <button type="button" data-interest="shopping" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🛍️ Shopping</button>
+            <button type="button" data-interest="movies" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🎬 Movies</button>
+            <button type="button" data-interest="art" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🎨 Art</button>
+            <button type="button" data-interest="nature" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🌿 Nature</button>
+            <button type="button" data-interest="adventure" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🧗 Adventure</button>
+            <button type="button" data-interest="coffee" onclick="toggleInterest(this)"
+              class="interest-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">☕ Coffee</button>
+          </div>
+        </div>
+
+        <!-- Constraints -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Constraints <span class="text-gray-400 text-xs">(optional)</span></label>
+          <div class="flex flex-wrap gap-2" id="constraintGrid">
+            <button type="button" data-constraint="vegetarian" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400 active">🥗 Vegetarian</button>
+            <button type="button" data-constraint="vegan" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🌱 Vegan</button>
+            <button type="button" data-constraint="avoid crowded places" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400 active">😶 Avoid Crowds</button>
+            <button type="button" data-constraint="wheelchair accessible" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">♿ Accessible</button>
+            <button type="button" data-constraint="no alcohol" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">🚫 No Alcohol</button>
+            <button type="button" data-constraint="kid-friendly" onclick="toggleConstraint(this)"
+              class="constraint-btn tag-btn text-xs border border-gray-300 rounded-full px-3 py-1 hover:border-purple-400">👶 Kid-Friendly</button>
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn"
+          class="w-full gradient-bg text-white font-semibold py-3 rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2 text-sm">
+          <span id="submitIcon">🗓️</span>
+          <span id="submitText">Plan My Perfect Saturday</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- RIGHT: Agent Trace + Plan -->
+    <section class="space-y-4">
+
+      <!-- Agent Trace -->
+      <div id="tracePanel" class="bg-white rounded-2xl card-shadow p-6 hidden">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-2 h-2 rounded-full bg-purple-500 pulse-dot" id="traceDot"></div>
+          <h3 class="font-semibold text-gray-800 text-sm">Agent Trace</h3>
+          <span id="traceStatus" class="ml-auto text-xs text-gray-400">Running...</span>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="flex gap-1 mb-4" id="progressSteps">
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="1">1</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="2">2</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="3">3</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="4">4</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="5">5</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="6">6</div>
+          <div class="progress-step text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300 text-gray-400" data-step="7">7</div>
+        </div>
+
+        <div id="traceLog" class="space-y-2 max-h-48 overflow-y-auto text-xs"></div>
+      </div>
+
+      <!-- Plan Output -->
+      <div id="planPanel" class="hidden space-y-4">
+
+        <!-- Plan Header -->
+        <div id="planHeader" class="bg-white rounded-2xl card-shadow p-6 plan-card">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 id="planTitle" class="text-xl font-bold text-gray-900"></h2>
+              <p id="planSummary" class="mt-1 text-sm text-gray-600 leading-relaxed"></p>
+            </div>
+          </div>
+
+          <!-- Budget Bar -->
+          <div class="mt-4">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Budget Used</span>
+              <span><span id="costUsed"></span> / <span id="costTotal"></span></span>
+            </div>
+            <div class="bg-gray-100 rounded-full h-2">
+              <div id="costBar" class="cost-bar h-2 rounded-full bg-purple-500" style="width:0%"></div>
+            </div>
+            <div class="flex justify-between text-xs mt-1">
+              <span class="text-green-600" id="remainingBudget"></span>
+              <span id="budgetPct" class="text-purple-600 font-medium"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Slots -->
+        <div id="timeSlotsContainer" class="bg-white rounded-2xl card-shadow p-6 plan-card">
+          <h3 class="font-semibold text-gray-800 mb-4 text-sm">Your Day</h3>
+          <div id="timeSlots" class="relative space-y-6"></div>
+        </div>
+
+        <!-- Trade-offs & Notes -->
+        <div id="notesPanel" class="bg-purple-50 rounded-2xl p-5 plan-card hidden">
+          <h3 class="font-semibold text-purple-800 text-sm mb-2">💡 Agent Notes</h3>
+          <div id="tradeOffs" class="text-xs text-purple-700 mb-2"></div>
+          <div id="fallback" class="text-xs text-purple-600"></div>
+        </div>
+
+        <!-- Replay button -->
+        <button onclick="resetForm()"
+          class="w-full text-purple-600 border border-purple-300 rounded-xl py-2.5 text-sm font-medium hover:bg-purple-50 transition">
+          ↩ Plan Another Saturday
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <div id="emptyState" class="bg-white rounded-2xl card-shadow p-10 text-center text-gray-400">
+        <div class="text-5xl mb-3">🗓️</div>
+        <p class="text-sm">Fill in the form and hit <strong>Plan My Saturday</strong> to see your personalised plan appear here with a live agent trace.</p>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6">
+    Built with FastAPI · OpenAI · Swiggy · Foursquare · Google Places · Tavily
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

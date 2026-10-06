@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\vasista.magam\\\\Documents\\\\Sat_planner\\\\app\\\\agent\\\\tools\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\vasista.magam\\\\Documents\\\\Sat_planner\\\\app\\\\models\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\vasista.magam\\\\Documents\\\\Sat_planner\\\\static\")",
+      "PowerShell(python \"C:\\\\Users\\\\VASIST~1.MAG\\\\AppData\\\\Local\\\\Temp\\\\test_plan_hyd.py\" 2>&1)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; Start-Sleep -Seconds 2; Set-Location \"C:\\\\Users\\\\vasista.magam\\\\Documents\\\\Sat_planner\"; Start-Process -FilePath \"venv\\\\Scripts\\\\python.exe\" -ArgumentList \"-m\", \"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8080\" -WindowStyle Hidden; Start-Sleep -Seconds 6; netstat -ano | findstr \"8080\")",
+      "PowerShell(Get-Command python,python3,py -ErrorAction SilentlyContinue | Select-Object Name, Source; ls \"C:\\\\Users\\\\vasista.magam\\\\Documents\\\\Sat_planner\" | Where-Object {$_.Name -match \"venv|env|\\\\.venv\"})"
+    ]
+  }
+}
